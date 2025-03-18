@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import utils
 
+
 def fit(X, k, do_plot=False):
     N, D = X.shape
     y = np.ones(N)
@@ -21,7 +22,7 @@ def fit(X, k, do_plot=False):
 
         # Update means
         for kk in range(k):
-            means[kk] = X[y==kk].mean(axis=0)
+            means[kk] = X[y == kk].mean(axis=0)
 
         changes = np.sum(y != y_old)
         print('Running K-means, changes in cluster assignment = {}'.format(changes))
@@ -42,12 +43,23 @@ def fit(X, k, do_plot=False):
 
     return model
 
+
 def predict(model, X):
     means = model['means']
     dist2 = utils.euclidean_dist_squared(X, means)
     dist2[np.isnan(dist2)] = np.inf
     return np.argmin(dist2, axis=1)
 
+
 def error(model, X):
-    """ YOUR CODE HERE """
-    raise NotImplementedError
+    # Get the cluster assignments for each point in X
+    y = model['predict'](model, X)
+    means = model['means']
+
+    # Compute the squared distances to all means
+    dist2 = utils.euclidean_dist_squared(X, means)
+
+    # For each point, select the squared distance to its assigned mean
+    error = np.sum(dist2[np.arange(X.shape[0]), y])
+
+    return error
